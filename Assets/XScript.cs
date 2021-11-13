@@ -5,7 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-public class XScript : MonoBehaviour {
+public class XScript : MonoBehaviour
+{
     public KMBombModule Module;
     public KMBombInfo Info;
     public bool YMode;
@@ -25,7 +26,7 @@ public class XScript : MonoBehaviour {
 
     private int val = 0;
     private static List<int> vals = new List<int>();
-    private bool _solved = false;
+    private bool _solved, _hasOpened;
 
     private static readonly bool[][] CODEX = new bool[][] {
         new bool[] { true,  true,  true,  true,  true,  true,  true,  false, false, false, true,  false, false, false, true,  true,  false, false, true,  true,  true,  true,  true,  true,  true },
@@ -82,7 +83,7 @@ public class XScript : MonoBehaviour {
         new bool[] { true,  true,  true,  true,  true,  true,  true, false,  true, false,  true, false, false,  true,  true, false,  true, false, false, false, false, false,  true,  true,  true }
     };
 
-  private static readonly bool[][] CODESECRETX = new bool[][] {
+    private static readonly bool[][] CODESECRETX = new bool[][] {
     new bool[] {true,true,true,true,true,true,true, false,true,true,true,true, false,true,true, false, false, false,true,true,true,true,true,true,true },
     new bool[] {true, false, false, false, false, false,true, false, false, false, false,true,true, false, false,true, false, false,true, false, false, false, false, false,true },
     new bool[] {true, false,true,true,true, false,true, false, false,true, false,true, false,true, false, false,true, false,true, false,true,true,true, false,true },
@@ -109,7 +110,7 @@ public class XScript : MonoBehaviour {
     new bool[] {true, false, false, false, false, false,true, false,true,true,true,true, false,true, false, false, false, false,true, false,true, false, false, false, false },
     new bool[] {true,true,true,true,true,true,true, false,true, false,true,true, false,true,true,true,true, false, false,true,true,true, false, false,true }
   };
-  private static readonly bool[][] CODESECRETY = new bool[][] {
+    private static readonly bool[][] CODESECRETY = new bool[][] {
     new bool[] {true,true,true,true,true,true,true, false, false, false,true, false, false, false,true,true, false, false,true,true,true,true,true,true,true },
     new bool[] {true, false, false, false, false, false,true, false,true,true,true, false, false,true,true, false,true, false,true, false, false, false, false, false,true },
     new bool[] {true, false,true,true,true, false,true, false,true, false, false, false, false, false, false,true,true, false,true, false,true,true,true, false,true },
@@ -194,22 +195,23 @@ public class XScript : MonoBehaviour {
     private Application.LogCallback logd;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         val = Random.Range(0, 30);
         StartCoroutine(activate());
         logd = new Application.LogCallback(LogReader);
         Application.logMessageReceived += logd;
         StartCoroutine(Flash());
         coverSel.OnInteract += delegate () { coverSel.AddInteractionPunch(); return false; };
-	}
-	
-	private void HandleLazy()
+    }
+
+    private void HandleLazy()
     {
-        if (YMode && !Info.GetSolvableModuleNames().Contains("X"))
+        if(YMode && !Info.GetSolvableModuleNames().Contains("X"))
         {
             StartCoroutine(Open());
         }
-        else if (!YMode && Info.GetSolvableModuleNames().Contains("Y"))
+        else if(!YMode && Info.GetSolvableModuleNames().Contains("Y"))
         {
             StartCoroutine(Open());
         }
@@ -217,24 +219,25 @@ public class XScript : MonoBehaviour {
 
     private void HandleMash(int count)
     {
-        if (count < 3) return;
-        if (count == 3)
+        if(count < 3) return;
+        if(count == 3)
         {
-            if (!YMode && !Info.GetSolvableModuleNames().Contains("Y"))
+            if(!YMode && !Info.GetSolvableModuleNames().Contains("Y"))
             {
                 StartCoroutine(Open());
             }
-            else if (YMode && Info.GetSolvableModuleNames().Contains("X"))
+            else if(YMode && Info.GetSolvableModuleNames().Contains("X"))
             {
                 StartCoroutine(Open());
             }
         }
-        else if (count <= 10) { }
-        else if (count == val + 11)
+        else if(count <= 10) { }
+        else if(count == val + 11)
         {
-            if (!_solved)
+            if(!_solved)
             {
                 Module.HandlePass();
+                _solved = true;
                 Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, transform);
                 try
                 {
@@ -250,15 +253,18 @@ public class XScript : MonoBehaviour {
                 }
             }
         }
-        else if (!vals.Contains(count))
+        else if(!vals.Contains(count))
         {
-            if (!_solved) Module.HandleStrike();
+            if(!_solved) Module.HandleStrike();
         }
     }
 
     private IEnumerator Open()
     {
-        for (float i = 0f; i < 120f; i++)
+        if(_hasOpened)
+            yield break;
+        _hasOpened = true;
+        for(float i = 0f; i < 120f; i++)
         {
             Hinge.localRotation = Quaternion.Slerp(StartPos.localRotation, Target.localRotation, i / 120f);
             yield return null;
@@ -275,13 +281,13 @@ public class XScript : MonoBehaviour {
     private IEnumerator activate()
     {
         bool HasTOO = Info.GetSolvableModuleIDs().Contains("theOldOnes");
-        if (first)
+        if(first)
         {
             vals = new List<int>();
             first = false;
             meFirst = true;
         }
-        if (/*firstX && */!YMode)
+        if(/*firstX && */!YMode)
         {
             char[] ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
             bool[][] code = HasTOO ? YMode ? CODESECRETY : CODESECRETX : YMode ? CODEY : CODEX;
@@ -293,7 +299,7 @@ public class XScript : MonoBehaviour {
             firstX = false;
             StartCoroutine(ResetFirst());
         }
-        else if (/*firstY && */YMode)
+        else if(/*firstY && */YMode)
         {
             char[] ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
             bool[][] code = HasTOO ? YMode ? CODESECRETY : CODESECRETX : YMode ? CODEY : CODEX;
@@ -311,7 +317,7 @@ public class XScript : MonoBehaviour {
             text.color = new Color(1f, 0f, 0f);
         }
         yield return null;
-        if (!meFirst)
+        if(!meFirst)
         {
             yield return null;
         }
@@ -323,11 +329,11 @@ public class XScript : MonoBehaviour {
 
 
             List<Component> Alarms = new List<Component>();
-            foreach (var y in components)
+            foreach(var y in components)
             {
-                foreach (var w in y)
+                foreach(var w in y)
                 {
-                    if (w.GetType().Name == "Selectable") Alarms.Add(w);
+                    if(w.GetType().Name == "Selectable") Alarms.Add(w);
                 }
             }
 
@@ -346,13 +352,13 @@ public class XScript : MonoBehaviour {
             Regex rxAdd = new Regex("combineimpl", RegexOptions.IgnoreCase);
             MethodInfo addHandler = tOIH.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static).Where(x => rxAdd.IsMatch(x.Name)).First();
             addHandlerArgs = new System.Object[] { d };
-            if (meFirst)
+            if(meFirst)
             {
                 System.Object clock = fldOnInt.GetValue(AlarmButton);
                 fldOnInt.SetValue(AlarmButton, prevClock);
                 prevClock = clock;
             }
-            if (fldOnInt.GetValue(AlarmButton) == null)
+            if(fldOnInt.GetValue(AlarmButton) == null)
                 fldOnInt.SetValue(AlarmButton, d);
             else
             {
@@ -427,6 +433,7 @@ public class XScript : MonoBehaviour {
             GetComponent<KMSelectable>().Children[0].OnInteract += delegate ()
             {
                 Module.HandlePass();
+                _solved = true;
                 return false;
             };
         }
@@ -459,7 +466,7 @@ public class XScript : MonoBehaviour {
         yield return null;
         pressActive = false;
         yield return new WaitForSeconds(2f);
-        if (count != currentCount) yield break;
+        if(count != currentCount) yield break;
         HandleMash(currentCount);
         currentCount = 0;
     }
@@ -468,15 +475,15 @@ public class XScript : MonoBehaviour {
 
     private void LogReader(string condition, string stacktrace, LogType type)
     {
-        if (!ALMOFF.IsMatch(condition)) return;
+        if(!ALMOFF.IsMatch(condition)) return;
         StartCoroutine(WaitForPress());
     }
 
     private IEnumerator WaitForPress()
     {
-        for (int i = 0; i < 3; i++)
+        for(int i = 0; i < 3; i++)
         {
-            if (pressActive) yield break;
+            if(pressActive) yield break;
             yield return null;
         }
         HandleLazy();
@@ -485,14 +492,12 @@ public class XScript : MonoBehaviour {
     private IEnumerator Flash()
     {
         int prevTime = (int)Mathf.Floor(Info.GetTime());
-        while (true)
+        while(true)
         {
-            for (int i = 0; i < Patterns.Length; i++)
-            {
-                Blinker.material.color = (YMode ? Patterns[i][val] : Patterns[val][i]) ? new Color(1f, 1f, 1f) : new Color(0f, 0f, 0f);
-                yield return new WaitWhile(() => Mathf.Abs(Mathf.Floor(Info.GetTime()) - prevTime) < 1);
-                prevTime = (int)Mathf.Floor(Info.GetTime());
-            }
+            int adjustedTime = (Mathf.FloorToInt(Info.GetTime()) + 2) % 30;
+            Blinker.material.color = (YMode ? Patterns[adjustedTime][val] : Patterns[val][adjustedTime]) ? new Color(1f, 1f, 1f) : new Color(0f, 0f, 0f);
+            yield return new WaitWhile(() => Mathf.Abs(Mathf.Floor(Info.GetTime()) - prevTime) < 1);
+            prevTime = (int)Mathf.Floor(Info.GetTime());
         }
     }
 }
