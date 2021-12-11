@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Name: WorkshopItem
   m_EditorClassIdentifier: 
   WorkshopPublishedFileID: 2325719404
-  Title: X and Y
+  Title: X, Y and Z
   Tags:
   - Regular Module

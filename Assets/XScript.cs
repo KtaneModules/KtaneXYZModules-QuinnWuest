@@ -19,12 +19,13 @@ public class XScript : MonoBehaviour
 
     private bool pressActive = false;
     private int currentCount = 0;
+    private static int _idc;
 
     private static bool first = true;
     private static bool firstX = true;
     private static bool firstY = true;
 
-    private int val = 0;
+    private int val = 0, _id = ++_idc;
     private static List<int> vals = new List<int>();
     private bool _solved, _hasOpened;
 
@@ -138,7 +139,7 @@ public class XScript : MonoBehaviour
     new bool[] {true,true,true,true,true,true,true, false,true, false,true, false,true, false, false, false,true,true, false, false,true, false, false,true,true }
   };
 
-    private static readonly bool[][] Patterns = new bool[][] {
+    internal static readonly bool[][] Patterns = new bool[][] {
         new bool[] { false, false, false, false, false,   false, true , false, false, false,   false, true , false, false, false,   false, false, false, false, false,   false, false, true , false, false,   false, false, false, false, false },
         new bool[] { false, false, false, false, false,   false, true , false, false, false,   false, false, true , false, false,   false, false, false, false, false,   false, false, false, true , false,   false, false, false, false, false },
         new bool[] { false, false, false, false, false,   false, false, false, false, false,   false, false, true , false, true ,   false, false, false, false, false,   false, false, false, false, true ,   false, false, false, false, false },
@@ -198,6 +199,7 @@ public class XScript : MonoBehaviour
     void Start()
     {
         val = Random.Range(0, 30);
+        Debug.LogFormat(YMode ? "[Y #{0}] Using column {1}." : "[X #{0}] Using rown {1}.", _id, val + 1);
         StartCoroutine(activate());
         logd = new Application.LogCallback(LogReader);
         Application.logMessageReceived += logd;
@@ -219,6 +221,7 @@ public class XScript : MonoBehaviour
 
     private void HandleMash(int count)
     {
+        Debug.LogFormat(YMode ? "[Y #{0}] Received {1} mashes." : "[X #{0}] Received {1} mashes.", _id, count);
         if(count < 3) return;
         if(count == 3)
         {
