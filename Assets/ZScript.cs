@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 using rng = UnityEngine.Random;
@@ -18,7 +19,8 @@ public class ZScript : MonoBehaviour
     [SerializeField]
     private Transform _hinge, _startPos, _targetPos;
 
-    private bool _hasOpened, _isActive, _isSolved, _isPlaying;
+    private bool _hasOpened, _isActive, _isSolved, _isPlaying, _tpActiveOverride;
+    private static bool _tpZOn, _tpZOff;
     private static int _idc;
     private int _wordIx, _id = ++_idc, _clicks, _submitStatus;
     private KMAudio.KMAudioRef _ref;
@@ -41,14 +43,14 @@ public class ZScript : MonoBehaviour
 
     private void Update()
     {
-        if(!_hasOpened && Input.GetKeyDown(KeyCode.Z))
+        if(!_hasOpened && (Input.GetKeyDown(KeyCode.Z) || _tpZOn))
             StartCoroutine(Open());
-        if(_submitStatus == 0 && _isActive && !_isSolved && !_isPlaying && Input.GetKeyDown(KeyCode.Z))
+        if(_submitStatus == 0 && (_isActive || _tpActiveOverride) && !_isSolved && !_isPlaying && (Input.GetKeyDown(KeyCode.Z) || _tpZOn))
         {
             _isPlaying = true;
             _routine = StartCoroutine(PlayMusic());
         }
-        if(_submitStatus == 0 && _isPlaying && Input.GetKeyUp(KeyCode.Z))
+        if(_submitStatus == 0 && _isPlaying && (Input.GetKeyUp(KeyCode.Z) || _tpZOff))
         {
             if(_clicks == 0)
             {
@@ -145,5 +147,58 @@ public class ZScript : MonoBehaviour
             i++;
             i %= mod;
         }
+    }
+
+    string TwitchHelpMessage = @"Use ""!{0} Z"" to press Z once. Use ""!{0} Z 6"" to hold Z for that many beats.";
+
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        command = command.ToLowerInvariant().Trim();
+        Match m;
+
+        if(command == "z")
+        {
+            yield return null;
+            _tpZOn = true;
+            yield return null;
+            yield return null;
+            _tpZOn = false;
+            _tpZOff = true;
+            yield return null;
+            yield return null;
+            _tpZOff = false;
+        }
+        else if((m = Regex.Match(command, @"^\s*z\s+([1-7])\s*$")).Success)
+        {
+            int c = int.Parse(m.Groups[1].Value);
+            yield return null;
+            _tpZOn = true;
+            yield return null;
+            yield return null;
+            _tpZOn = false;
+            yield return new WaitUntil(() => _clicks == c);
+            _tpZOff = true;
+            yield return null;
+            yield return null;
+            _tpZOff = false;
+        }
+
+        yield break;
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        yield return null;
+        _tpActiveOverride = true;
+        _tpZOn = true;
+        yield return null;
+        yield return null;
+        _tpZOn = false;
+        yield return new WaitUntil(() => _clicks == _wordIx + 1);
+        _tpZOff = true;
+        yield return null;
+        yield return null;
+        _tpZOff = false;
+        yield break;
     }
 }
