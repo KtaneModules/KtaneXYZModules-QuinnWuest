@@ -27,7 +27,7 @@ public class ZScript : MonoBehaviour
     private Coroutine _routine;
 
     private static readonly string[] ZWORDS = new string[] { "ealots", "ealous", "ipping", "odiacs", "ombies", "oology", "ygotes" };
-    private static readonly string[] ZWORDSTX = new string[] { ".   . ...   . . ... .   ... ... ...   ...   . . .   ", ".   . ...   . . ... .   ... ... ...   . . ...   . . .   ", ". .   . ... ... .   . ... ... .   . .   ... .   ... ... .   ", "... ... ...   ... . .   . .   . ...   ... . ... .   . . .   ", "... ... ...   ... ...   ... . . .   . .   .   . . .   ", "... ... ...   ... ... ...   . . ... .   ... ... ...   ... ... .   ... . ... ...   ", "... ... . ...   ... ... .   ... ... ...   ...   .   . . .   " };
+    private static readonly string[] ZWORDSTX = new string[] { ".   . ...   . . ... .   ... ... ...   ...   . . .   ", ".   . ...   . . ... .   ... ... ...   . . ...   . . .   ", ". .   . ... ... .   . ... ... .   . .   ... .   ... ... .   ", "... ... ...   ... . .   . .   . ...   ... . ... .   . . .   ", "... ... ...   ... ...   ... . . .   . .   .   . . .   ", "... ... ...   ... ... ...   . . ... .   ... ... ...   ... ... .   ... . ... ...   ", "... . ... ...   ... ... .   ... ... ...   ...   .   . . .   " };
 
     private void Start()
     {
@@ -155,6 +155,12 @@ public class ZScript : MonoBehaviour
     {
         command = command.ToLowerInvariant().Trim();
         Match m;
+
+        if(command == "j")
+        {
+            yield return null;
+            _audio.PlaySoundAtTransform("j", transform);
+        }
 
         if(command == "z")
         {
