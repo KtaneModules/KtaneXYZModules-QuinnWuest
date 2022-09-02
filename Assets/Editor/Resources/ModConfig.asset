@@ -14,10 +14,11 @@ MonoBehaviour:
   id: XandY
   title: X, Y, and Z
   author: BakersDozenBagels
-  description: 'A pack containing three modules.
-
-
-    Their IDs are: xModule, yModule, zModule'
+  description: "A pack containing three modules.\n\nThis is a reuploaded item from
+    a creator who wishes to remain anonymous.\n\nX - [url=https://ktane.timwi.de/HTML/X.html]manual[/url]\r\nY
+    - [url=https://ktane.timwi.de/HTML/Y.html]manual[/url]\r\nZ - [url=https://ktane.timwi.de/HTML/Z.html]manual[/url]\n\nX,
+    Y, and Z (xModule, yModule, zModule) v3.3\nMaintained by Quinn Wuest\nTwitch Plays
+    supported"
   version: 3.3
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 3d4cc25219b626a4ea5b0c505e3a0245, type: 3}
