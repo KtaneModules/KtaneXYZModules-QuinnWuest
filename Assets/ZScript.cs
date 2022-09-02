@@ -6,23 +6,17 @@ using rng = UnityEngine.Random;
 
 public class ZScript : MonoBehaviour
 {
-    [SerializeField]
-    private KMSelectable _button;
-    [SerializeField]
-    private KMBombModule _module;
-    [SerializeField]
-    private KMAudio _audio;
-    [SerializeField]
-    private KMBombInfo _info;
-    [SerializeField]
-    private Renderer _blinkerL, _blinkerR;
-    [SerializeField]
-    private Transform _hinge, _startPos, _targetPos;
+    public KMSelectable _button;
+    public KMBombModule _module;
+    public KMAudio _audio;
+    public KMBombInfo _info;
+    public Renderer _blinkerL, _blinkerR;
+    public Transform _hinge, _startPos, _targetPos;
 
     private bool _hasOpened, _isActive, _isSolved, _isPlaying, _tpActiveOverride;
     private static bool _tpZOn, _tpZOff;
     private static int _idc;
-    private int _wordIx, _id = ++_idc, _clicks, _submitStatus;
+    private int _wordIx, _id, _clicks, _submitStatus;
     private KMAudio.KMAudioRef _ref;
     private Coroutine _routine;
 
@@ -31,6 +25,7 @@ public class ZScript : MonoBehaviour
 
     private void Start()
     {
+        _id = ++_idc;
         _wordIx = rng.Range(0, ZWORDS.Length);
 
         Debug.LogFormat("[Z #{0}] Chose word #{1} (Z{3}).", _id, _wordIx + 1, null, ZWORDS[_wordIx]);
@@ -148,19 +143,14 @@ public class ZScript : MonoBehaviour
             i %= mod;
         }
     }
-
-    string TwitchHelpMessage = @"Use ""!{0} Z"" to press Z once. Use ""!{0} Z 6"" to hold Z for that many beats.";
+#pragma warning disable 0414
+    private readonly string TwitchHelpMessage = @"Use ""!{0} Z"" to press Z once. Use ""!{0} Z 6"" to hold Z for that many beats.";
+#pragma warning restore 0414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
         command = command.ToLowerInvariant().Trim();
         Match m;
-
-        if(command == "j")
-        {
-            yield return null;
-            _audio.PlaySoundAtTransform("j", transform);
-        }
 
         if(command == "z")
         {
